@@ -1,32 +1,50 @@
-import { useEffect, useState } from "react";
-import { getProducts, getProductsByCategory} from "../../asyncMock";
-import useParams from "react-router-dom";
+import { useState, useEffect } from "react";
+import ItemList from "../ItemList/ItemList";
+import { useParams } from "react-router-dom";
+import { getDocs, collection, query, where } from "firebase/firestore";
+import { db } from "../../config/firebase";
 
-const ItemListContainer = ({greeting}) =>{
-    const [products, setProducts] = useState([])
+const ItemListContainer = ({ greeting }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const{ categoryId} = useParams()
+    const { categoryId } = useParams();
+
     useEffect(() => {
-        const asyncFunc = categoryId ? getProductsByCategory : getProducts
+        const fetchData = async () => {
+            setLoading(true);
 
-        asyncFunc(categoryId)
-        .then(response =>{
-            setProducts(response)
-        })
-        .catch(error =>{
-            console.error(error)
-        })
-    }, [categoryId])
+            try {
+                const collectionRef = categoryId
+                    ? query(collection(db, "products"), where("category", "==", categoryId))
+                    : collection(db, "products");
 
-    
-    return(
+                const response = await getDocs(collectionRef);
+
+                const productsAdapted = response.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+
+                setProducts(productsAdapted);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+
+
+    }, [categoryId]);
+
+    return (
         <div>
-            <section>
-                <h1>{greeting}</h1>
-                <ItemList products={products}/>
-            </section>
+            <h2>{greeting}</h2>
+            {loading ? <p>Cargando productos...</p> : <ItemList products={products} />}
         </div>
-    )
-} 
+    );
+};
 
 export default ItemListContainer;

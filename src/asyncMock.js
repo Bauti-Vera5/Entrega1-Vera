@@ -23,7 +23,7 @@ const products = [
         price: 7000,
         category: "Pantalones",
         img: "./components/CartWidget/assets/pantalon.jpg",
-        stock: 10,
+        stock: 9,
         description: "Descripcion del Cargo"
     },
     {
@@ -32,10 +32,10 @@ const products = [
         price: 600,
         category: "Accesorios",
         img: "./components/CartWidget/assets/pulsera.jpg",
-        stock: 10,
+        stock: 12,
         description: "Descripcion de la pulsera"
     }
-]
+];
 
 export const getProducts = () =>{
     return new Promise((resolve) => {
@@ -43,7 +43,7 @@ export const getProducts = () =>{
             resolve(products)
         }, 500)
     })
-}
+};
 
 export const getProductById = (productId) =>{
     return new Promise((resolve) => {
@@ -51,4 +51,4 @@ export const getProductById = (productId) =>{
             resolve(products.find(prod=> prod.id === productId))
         }, 500)
     })
-}
+};
